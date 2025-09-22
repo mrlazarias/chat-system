@@ -63,6 +63,9 @@ class Chat extends Component
 
         // Notificar WebSocket server via HTTP
         $this->notifyWebSocketServer($message->load('user'));
+
+        // Disparar evento para scroll automático
+        $this->dispatch('messageReceived');
     }
 
     private function notifyWebSocketServer($message)
@@ -95,6 +98,24 @@ class Chat extends Component
         } catch (\Exception $e) {
             // WebSocket server não disponível, continuar normalmente
         }
+    }
+
+    public function getUserColor($userId)
+    {
+        $colors = [
+            'background: linear-gradient(to right, #3b82f6, #2563eb); border-radius: 24px;', // blue
+            'background: linear-gradient(to right, #10b981, #059669); border-radius: 24px;', // green
+            'background: linear-gradient(to right, #8b5cf6, #7c3aed); border-radius: 24px;', // purple
+            'background: linear-gradient(to right, #ec4899, #db2777); border-radius: 24px;', // pink
+            'background: linear-gradient(to right, #6366f1, #4f46e5); border-radius: 24px;', // indigo
+            'background: linear-gradient(to right, #eab308, #ca8a04); border-radius: 24px;', // yellow
+            'background: linear-gradient(to right, #ef4444, #dc2626); border-radius: 24px;', // red
+            'background: linear-gradient(to right, #14b8a6, #0d9488); border-radius: 24px;', // teal
+            'background: linear-gradient(to right, #f97316, #ea580c); border-radius: 24px;', // orange
+            'background: linear-gradient(to right, #06b6d4, #0891b2); border-radius: 24px;', // cyan
+        ];
+
+        return $colors[$userId % count($colors)];
     }
 
     public function render()

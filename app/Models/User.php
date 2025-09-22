@@ -21,6 +21,12 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
+        'avatar',
+        'bio',
+        'phone',
+        'birth_date',
+        'location',
+        'website',
     ];
 
     /**
@@ -43,6 +49,7 @@ class User extends Authenticatable
         return [
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
+            'birth_date' => 'date',
         ];
     }
 
@@ -59,5 +66,30 @@ class User extends Authenticatable
     public function isParticipantOf($conversationId)
     {
         return $this->conversations()->where('conversations.id', $conversationId)->exists();
+    }
+
+    /**
+     * Get the user's avatar URL or default avatar
+     */
+    public function getAvatarUrlAttribute()
+    {
+        if ($this->avatar) {
+            return asset('storage/' . $this->avatar);
+        }
+
+        // Generate a default avatar using the user's initials
+        return 'https://ui-avatars.com/api/?name=' . urlencode($this->name) . '&color=7F9CF5&background=EBF4FF';
+    }
+
+    /**
+     * Get the user's initials for avatar
+     */
+    public function getInitialsAttribute()
+    {
+        $words = explode(' ', $this->name);
+        if (count($words) >= 2) {
+            return strtoupper(substr($words[0], 0, 1) . substr($words[1], 0, 1));
+        }
+        return strtoupper(substr($this->name, 0, 2));
     }
 }
