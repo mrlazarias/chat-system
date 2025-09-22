@@ -61,8 +61,40 @@ class Chat extends Component
         ]);
         $this->messageText = '';
 
-        broadcast(new \App\Events\MessageSent($message->load('user')))->toOthers();
-        $this->dispatch('messageReceived');
+        // Notificar WebSocket server via HTTP
+        $this->notifyWebSocketServer($message->load('user'));
+    }
+
+    private function notifyWebSocketServer($message)
+    {
+        try {
+            $data = [
+                'type' => 'message',
+                'conversationId' => $message->conversation_id,
+                'id' => $message->id,
+                'user_id' => $message->user_id,
+                'body' => $message->body,
+                'user' => [
+                    'id' => $message->user->id,
+                    'name' => $message->user->name,
+                ],
+                'created_at' => $message->created_at->toDateTimeString(),
+            ];
+
+            // Enviar via HTTP para o WebSocket server
+            $context = stream_context_create([
+                'http' => [
+                    'method' => 'POST',
+                    'header' => 'Content-Type: application/json',
+                    'content' => json_encode($data),
+                    'timeout' => 1
+                ]
+            ]);
+
+            @file_get_contents('http://127.0.0.1:6001/broadcast', false, $context);
+        } catch (\Exception $e) {
+            // WebSocket server não disponível, continuar normalmente
+        }
     }
 
     public function render()
