@@ -14,6 +14,16 @@ Route::view('profile', 'profile')
     ->middleware(['auth'])
     ->name('profile');
 
+// Rota para visualizar perfil de outros usuários
+Route::get('/profile/{user}', function (App\Models\User $user) {
+    return view('profile.show', compact('user'));
+})->middleware(['auth'])->name('profile.show');
+
+// Rota para listar usuários
+Route::view('/users', 'users.index')
+    ->middleware(['auth'])
+    ->name('users.index');
+
 Route::get('/chat', Chat::class)->middleware('auth')->name('chat');
 
 // API para mensagens em tempo real
