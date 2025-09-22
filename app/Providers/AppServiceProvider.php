@@ -19,6 +19,9 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        //
+        // Redirecionar para /chat após login
+        \Illuminate\Support\Facades\Redirect::macro('intended', function ($default = '/chat') {
+            return redirect()->intended($default);
+        });
     }
 }

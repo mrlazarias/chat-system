@@ -45,4 +45,19 @@ class User extends Authenticatable
             'password' => 'hashed',
         ];
     }
+
+    public function conversations()
+    {
+        return $this->belongsToMany(Conversation::class, 'conversation_user')->withTimestamps()->withPivot('last_read_at');
+    }
+
+    public function messages()
+    {
+        return $this->hasMany(Message::class);
+    }
+
+    public function isParticipantOf($conversationId)
+    {
+        return $this->conversations()->where('conversations.id', $conversationId)->exists();
+    }
 }
